@@ -93,6 +93,13 @@ add_subdirectory(src/assembler)
 option(BUILD_GOESRECV "Build goesrecv" ON)
 if(${BUILD_GOESRECV})
   add_subdirectory(src/goesrecv)
+
+    # MK NOTE: Adding goesrecv.conf example conf file as part of build process.
+    # This allows it to copied and accessible on remote host.
+  configure_file(
+          scripts/mk_scripts/goesrecv.conf
+          "${PROJECT_BINARY_DIR}/share/goesrecv.conf"
+          COPYONLY)
 endif()
 
 option(BUILD_GOESLRIT "Build goeslrit" ON)

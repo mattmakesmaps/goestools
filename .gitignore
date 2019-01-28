@@ -1,2 +1,5 @@
 /build*
 /xcompile
+
+.idea/*
+cmake-build-*
