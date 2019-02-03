@@ -24,6 +24,8 @@ Demodulator::Demodulator(Demodulator::Type t) {
 
   // Initialize queues
   // It is possible to attach publishers before starting the demodulator
+  // MK NOTE: We're actually using a queue class implemented in this
+  // project. This queue takes a size as a parameter in its constructor.
   sourceQueue_ = std::make_shared<Queue<Samples> >(4);
   agcQueue_ = std::make_shared<Queue<Samples> >(2);
   costasQueue_ = std::make_shared<Queue<Samples> >(2);

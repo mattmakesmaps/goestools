@@ -20,6 +20,10 @@ public:
     HRIT = 2,
   };
 
+  // explicit keyword means that the
+  // Demodulator constructor must be called with
+  // a Type parameter, can't implicitly convert
+  // input parameter into a Type instance.
   explicit Demodulator(Type t);
 
   void initialize(Config& config);
@@ -31,6 +35,8 @@ public:
   void start();
   void stop();
 
+  // protected members of Demodulator are accessible
+  // by it's children.
 protected:
   void publishStats();
 
