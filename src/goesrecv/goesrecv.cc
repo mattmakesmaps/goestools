@@ -18,6 +18,9 @@ static void signalHandler(int signum) {
 
 int main(int argc, char** argv) {
   auto opts = parseOptions(argc, argv);
+  // load() is a static method defined in the `Config` header.
+  // Therefore it is not called on the instance `config` but
+  // rather the class `Config`.
   auto config = Config::load(opts.config);
 
   // Convert string option to enum
@@ -27,6 +30,9 @@ int main(int argc, char** argv) {
   } else if (config.demodulator.downlinkType == "hrit") {
     downlinkType = Demodulator::HRIT;
   } else {
+      // config.demodulator.downlinkType doesn't have a default value
+      // so we need to throw an error in the event one is not provided
+      // in the config.
     std::cerr
       << "Invalid downlink type: "
       << config.demodulator.downlinkType

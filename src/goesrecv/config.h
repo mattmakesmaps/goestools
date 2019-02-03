@@ -7,7 +7,11 @@
 #include "sample_publisher.h"
 #include "soft_bit_publisher.h"
 
+// Config is a struct of structs,
+// Each first-level struct corresponding
+// to a block in the config file.
 struct Config {
+
   struct StatsPublisher {
     // Addresses to bind to. This is a vector because we always add an
     // inproc:// endpoint for the in-process monitoring code.
@@ -17,8 +21,12 @@ struct Config {
     size_t sendBuffer = 0;
   };
 
+  // Define the struct
   struct Demodulator {
     // LRIT or HRIT
+    // since these don't have default values
+    // they must be required. How does error handling work?
+    // in event it is not provided?
     std::string downlinkType;
 
     // String "airspy" or "rtlsdr"
@@ -31,6 +39,7 @@ struct Config {
     int decimation = 1;
   };
 
+  // declare a variable of the struct just defined.
   Demodulator demodulator;
 
   struct Airspy {

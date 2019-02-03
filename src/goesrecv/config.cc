@@ -4,6 +4,9 @@
 #include <sstream>
 #include <stdexcept>
 
+// TOML is Tom's Obvious Markup Language
+// The following C++ parsing lib is being used:
+// https://github.com/mayah/tinytoml/tree/8fe890978b3390de1fc1f26c2d6bf1711c700c5a
 #include <toml/toml.h>
 
 namespace {
@@ -93,6 +96,9 @@ Config::StatsPublisher createStatsPublisher(const toml::Value& v) {
   return out;
 }
 
+// Note: We don't check if all required keys are passed in here.
+// just validate that a key which was passed in is valid.
+// That does happen in the `demodulator.cc` class.
 void loadDemodulator(Config::Demodulator& out, const toml::Value& v) {
   const auto& table = v.as<toml::Table>();
   for (const auto& it : table) {
@@ -364,7 +370,13 @@ void loadMonitor(Config::Monitor& out, const toml::Value& v) {
 
 } // namespace
 
+// Config::load() returns an populated Config object.
+// this is the only public method in this class.
+// This method uses all of the helper methods defined in
+// the anonymous namespace above.
 Config Config::load(const std::string& file) {
+  // create a new Config object, to be populated with
+  // values from config file.
   Config out;
 
   auto pr = toml::parseFile(file);
@@ -372,10 +384,10 @@ Config Config::load(const std::string& file) {
     throw std::invalid_argument(pr.errorReason);
   }
 
-  const auto& table = pr.value.as<toml::Table>();
+  const auto& table = pr.value.as<toml::Table>(); // convert TOML table to std::map
   for (const auto& it : table) {
-    const auto& key = it.first;
-    const auto& value = it.second;
+    const auto& key = it.first; // key is a string
+    const auto& value = it.second; // value is a toml table
 
     if (key == "demodulator") {
       loadDemodulator(out.demodulator, value);
