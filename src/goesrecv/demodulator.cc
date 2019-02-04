@@ -35,6 +35,11 @@ Demodulator::Demodulator(Demodulator::Type t) {
 }
 
 void Demodulator::initialize(Config& config) {
+    // Source::build is a static method that essentially spins up
+    // a derived class from Source (RTLSDR) and sets up that instance
+    // based on values extracted from the config file.
+    // it returns a unique ptr to a Source
+
   source_ = Source::build(config.demodulator.source, config);
   sampleRate_ = source_->getSampleRate();
 
@@ -91,6 +96,7 @@ void Demodulator::publishStats() {
   statsPublisher_->publish(ss.str());
 }
 
+// MK TODO: Read up on some threading tutorials.
 void Demodulator::start() {
   thread_ = std::thread([&] {
       while (!sourceQueue_->closed()) {
@@ -118,6 +124,6 @@ void Demodulator::start() {
 }
 
 void Demodulator::stop() {
-  source_->stop();
+  source_->stop(); // Exit while loop in Demodulator::start()
   thread_.join();
 }

@@ -40,6 +40,11 @@ public:
 protected:
   void publishStats();
 
+  // The demodulator is composed of many other classes e.g.
+  // `AGC`, `Costas`, `ClockRecovery`, etc, as unique pointers.
+  // When the demodulator is destroyed, ostensibly these unique
+  // pointers allow for the automated destruction of the class
+  // instances they point to.
   uint32_t symbolRate_;
   uint32_t sampleRate_;
 
