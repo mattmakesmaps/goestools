@@ -17,6 +17,18 @@ public:
   }
 
   size_t size() {
+    /*
+     * unique_lock allows for only a single thread
+     * to have access to the resource at a given time.
+     * The thread working will have ownership of the mutex.
+     * I believe that the lock is released at the end
+     * of the block scope.
+     *
+     * I don't know why `unique_lock` was used over
+     * `lock_guard`. The answer is in the conditional variables usage:
+     * - `cv_.notify_one()`
+     * - `cv_.wait()`
+     */
     std::unique_lock<std::mutex> lock(m_);
     return elements_;
   }
