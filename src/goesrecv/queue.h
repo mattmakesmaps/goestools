@@ -50,6 +50,10 @@ public:
     ASSERT(!closed_);
 
     // Ensure there is an item to return
+    // MK NOTE:
+    // - If empty, and if we have capacity add a new pointer
+    //   to the template type.
+    // - If empty, and if we don't have capacity, block.
     if (write_.size() == 0) {
       if (elements_ < capacity_) {
         elements_++;
@@ -62,7 +66,12 @@ public:
       }
     }
 
+    // MK NOTE: We know we have an element to return.
+    // Move operation on unique pointer of template type
+    // in front of queue `write_` aliased to `v`.
     auto v = std::move(write_.front());
+    // MK NOTE: I believe that the front of `write_`
+    // is now a nullptr. so we remove it.
     write_.pop_front();
     return v;
   }
@@ -79,15 +88,23 @@ public:
   // popForRead returns existing item to read from
   std::unique_ptr<T> popForRead() {
     std::unique_lock<std::mutex> lock(m_);
+    // MK NOTE: block until `read_` queue has an item.
+    // will be notified by `pushWrite()`
     while (read_.size() == 0 && !closed_) {
       cv_.wait(lock);
     }
 
     // Allow read side to drain
+    // MK NOTE: drain in this context means
+    // just return nullptr. This can only
+    // happen if the Queue is closed AND
+    // read_ is empty.
     if (read_.size() == 0 && closed_) {
       return std::unique_ptr<T>(nullptr);
     }
 
+    // MK NOTE: See above for annotation from
+    // `popForWrite()`.
     auto v = std::move(read_.front());
     read_.pop_front();
     return v;
@@ -95,6 +112,9 @@ public:
 
   // pushRead returns read item to write queue
   void pushRead(std::unique_ptr<T> v) {
+    // MK NOTE: Same as `pushWrite()`.
+    // add a "read" item to the `write_` queue
+    // and unblock it.
     std::unique_lock<std::mutex> lock(m_);
     if (!closed_) {
       write_.push_back(std::move(v));

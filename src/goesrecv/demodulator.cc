@@ -99,6 +99,10 @@ void Demodulator::publishStats() {
 // MK TODO: Read up on some threading tutorials.
 void Demodulator::start() {
   thread_ = std::thread([&] {
+      // MK Note: These queues act like a connected pipes.
+      // sourceQueue_ --> agcQueue_ --> costasQueue_ --> rccQueue_
+      // --> clockRecoveryQueue_ --> softBitsQueue_
+      // each `work()` method takes a `qin` and `qout` param.
       while (!sourceQueue_->closed()) {
         agc_->work(sourceQueue_, agcQueue_);
         costas_->work(agcQueue_, costasQueue_);
