@@ -6,6 +6,7 @@ Quantize::Quantize() {
 void Quantize::work(
     const std::shared_ptr<Queue<std::vector<std::complex<float> > > >& qin,
     const std::shared_ptr<Queue<std::vector<int8_t> > >& qout) {
+  log_thread("quantize: qin->popForRead()");
   auto input = qin->popForRead();
   if (!input) {
     qout->close();
@@ -14,6 +15,7 @@ void Quantize::work(
 
   // Clear output so we can use push_back.
   // It will retain the associated memory allocation.
+  log_thread("quantize: qout->popForWrite()");
   auto output = qout->popForWrite();
   output->clear();
 
@@ -26,6 +28,7 @@ void Quantize::work(
   }
 
   // Return input buffer
+  log_thread("quantize: qin->pushRead()");
   qin->pushRead(std::move(input));
 
   // Publish output if applicable
@@ -34,5 +37,6 @@ void Quantize::work(
   }
 
   // Return output buffer
+  log_thread("quantize: qout->pushWrite()");
   qout->pushWrite(std::move(output));
 }

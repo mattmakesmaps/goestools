@@ -80,12 +80,14 @@ void AGC::work(
 void AGC::work(
     const std::shared_ptr<Queue<Samples> >& qin,
     const std::shared_ptr<Queue<Samples> >& qout) {
+    log_thread("AGC qin->popForRead()");
   auto input = qin->popForRead();
   if (!input) {
     qout->close();
     return;
   }
 
+  log_thread("AGC qout->popForWrite()");
   auto output = qout->popForWrite();
   auto nsamples = input->size();
   output->resize(nsamples);
@@ -96,6 +98,7 @@ void AGC::work(
   work(nsamples, ci, co);
 
   // Return input buffer
+  log_thread("AGC qin->pushRead()");
   qin->pushRead(std::move(input));
 
   // Publish output if applicable
@@ -104,5 +107,6 @@ void AGC::work(
   }
 
   // Return output buffer
+  log_thread("AGC qout->pushWrite()");
   qout->pushWrite(std::move(output));
 }

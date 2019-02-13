@@ -166,16 +166,19 @@ void ClockRecovery::setLoopBandwidth(float bw) {
 void ClockRecovery::work(
     const std::shared_ptr<Queue<Samples> >& qin,
     const std::shared_ptr<Queue<Samples> >& qout) {
+  log_thread("clock_recovery: qin->popForRead()");
   auto input = qin->popForRead();
   if (!input) {
     qout->close();
     return;
   }
 
+  log_thread("clock_recovery: qout->popForWrite()");
   auto output = qout->popForWrite();
   tmp_.insert(tmp_.end(), input->begin(), input->end());
 
   // Return read buffer (it has been copied into tmp_)
+  log_thread("clock_recovery: qin->pushRead()");
   qin->pushRead(std::move(input));
 
   // Omega is number of samples per symbol, so this
@@ -273,5 +276,6 @@ void ClockRecovery::work(
   }
 
   // Return output buffer
+  log_thread("clock_recovery: qout->pushWrite()");
   qout->pushWrite(std::move(output));
 }

@@ -216,6 +216,7 @@ void RTLSDR::handle(unsigned char* buf, uint32_t len) {
   ASSERT((nsamples & 0x3) == 0);
 
   // Grab buffer from queue
+  log_thread("rtlsdr_source::handle queue_->popForWrite()");
   auto out = queue_->popForWrite();
   out->resize(nsamples);
 
@@ -228,5 +229,6 @@ void RTLSDR::handle(unsigned char* buf, uint32_t len) {
   }
 
   // Return buffer to queue
+  log_thread("rtlsdr_source::handle queue_->pushWrite()");
   queue_->pushWrite(std::move(out));
 }

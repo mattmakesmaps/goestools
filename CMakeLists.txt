@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 2.8.12 FATAL_ERROR)
-
+# MK NOTE: Trying to fix debugging output: https://youtrack.jetbrains.com/issue/CPP-6828
+add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
 project(goesdec CXX C)
 
 # Remove directory from CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES and add it

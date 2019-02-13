@@ -1,11 +1,23 @@
 #pragma once
 
+#include <iostream>
+#include <string>
+#include <thread>
+
 #include <deque>
 #include <memory>
 #include <mutex>
 #include <condition_variable>
 
 #include <util/error.h>
+
+namespace {
+    void log_thread(std::string message)
+    {
+      std::cout << std::this_thread::get_id() << " " <<
+      message << std::endl;
+    }
+}
 
 template <class T>
 class Queue {
@@ -44,8 +56,10 @@ public:
     cv_.notify_one();
   }
 
+
   // popForWrite returns existing item to write to
   std::unique_ptr<T> popForWrite() {
+      log_thread("popForWrite()");
     std::unique_lock<std::mutex> lock(m_);
     ASSERT(!closed_);
 
@@ -61,11 +75,12 @@ public:
       } else {
         // Wait until pushRead makes an item available
         while (write_.size() == 0) {
+          log_thread("popForWrite(): WAITING (pushRead() unblocks me)");
           cv_.wait(lock);
         }
       }
     }
-
+    log_thread("popForWrite(): UNBLOCKED");
     // MK NOTE: We know we have an element to return.
     // Move operation on unique pointer of template type
     // in front of queue `write_` aliased to `v`.
@@ -80,19 +95,23 @@ public:
   void pushWrite(std::unique_ptr<T> v) {
     std::unique_lock<std::mutex> lock(m_);
     ASSERT(!closed_);
-
+    std::string message = "pushWrite(), notify_one";
+    log_thread(message);
     read_.push_back(std::move(v));
     cv_.notify_one();
   }
 
   // popForRead returns existing item to read from
   std::unique_ptr<T> popForRead() {
+    log_thread("popForRead()");
     std::unique_lock<std::mutex> lock(m_);
     // MK NOTE: block until `read_` queue has an item.
     // will be notified by `pushWrite()`
     while (read_.size() == 0 && !closed_) {
+      log_thread("popForRead(): WAITING (pushWrite() unblocks me)");
       cv_.wait(lock);
     }
+    log_thread("popForRead(): UNBLOCKED");
 
     // Allow read side to drain
     // MK NOTE: drain in this context means
@@ -118,6 +137,8 @@ public:
     std::unique_lock<std::mutex> lock(m_);
     if (!closed_) {
       write_.push_back(std::move(v));
+      std::string message = "pushRead(), notify_one";
+      log_thread(message);
       cv_.notify_one();
     }
   }

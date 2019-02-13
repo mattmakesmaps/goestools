@@ -80,6 +80,7 @@ void Nanomsg::loop() {
     ASSERT((nsamples & 0x3) == 0);
 
     // Grab buffer from queue
+    log_thread("nanomsg_source::loop() queue_->popForWrite()");
     auto out = queue_->popForWrite();
     out->resize(nsamples);
 
@@ -99,6 +100,7 @@ void Nanomsg::loop() {
     }
 
     // Return buffer to queue
+    log_thread("nanomsg_source::loop() queue_->pushWrite()");
     queue_->pushWrite(std::move(out));
   }
 }

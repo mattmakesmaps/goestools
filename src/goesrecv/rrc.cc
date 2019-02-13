@@ -136,12 +136,14 @@ void RRC::work(
 void RRC::work(
     const std::shared_ptr<Queue<Samples> >& qin,
     const std::shared_ptr<Queue<Samples> >& qout) {
+  log_thread("rrc: qin->popForRead()");
   auto input = qin->popForRead();
   if (!input) {
     qout->close();
     return;
   }
 
+  log_thread("rrc: qout->popForWrite()");
   auto output = qout->popForWrite();
   auto nsamples = input->size();
   ASSERT((nsamples % decimation_) == 0);
@@ -150,6 +152,7 @@ void RRC::work(
   ASSERT(tmp_.size() == input->size() + NTAPS);
 
   // Return read buffer (it has been copied into tmp_)
+  log_thread("rrc: qin->pushRead()");
   qin->pushRead(std::move(input));
 
   // Do actual work
@@ -167,5 +170,6 @@ void RRC::work(
   }
 
   // Return output buffer
+  log_thread("rrc: qout->pushWrite()");
   qout->pushWrite(std::move(output));
 }

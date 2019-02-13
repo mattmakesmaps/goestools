@@ -146,12 +146,15 @@ void Costas::work(
 void Costas::work(
     const std::shared_ptr<Queue<Samples> >& qin,
     const std::shared_ptr<Queue<Samples> >& qout) {
+
+  log_thread("costas: qin->pushRead()");
   auto input = qin->popForRead();
   if (!input) {
     qout->close();
     return;
   }
 
+  log_thread("costas: qout->popForWrite()");
   auto output = qout->popForWrite();
   auto nsamples = input->size();
   output->resize(nsamples);
@@ -165,6 +168,7 @@ void Costas::work(
   work(nsamples, fi, fo);
 
   // Return input buffer
+  log_thread("costas: qin->pushRead()");
   qin->pushRead(std::move(input));
 
   // Publish output if applicable
@@ -173,5 +177,6 @@ void Costas::work(
   }
 
   // Return output buffer
+  log_thread("costas: qout->pushWrite()");
   qout->pushWrite(std::move(output));
 }
