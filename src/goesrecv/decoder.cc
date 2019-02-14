@@ -24,6 +24,7 @@ public:
   virtual ~QueueReader() {
     // Return read buffer if needed
     if (tmp_) {
+      log_thread("Decoder ~QueueReader() queue_->pushRead()");
       queue_->pushRead(std::move(tmp_));
     }
   }
@@ -34,6 +35,7 @@ public:
     while (nread < count) {
       // Acquire new read buffer if we don't already have one
       if (!tmp_) {
+          log_thread("decoder: queue_->popForRead()");
         tmp_ = queue_->popForRead();
         if (!tmp_) {
           // Can't complete read when queue has closed.
@@ -53,6 +55,7 @@ public:
 
       // Return read buffer if it was exhausted
       if (pos_ == tmp_->size()) {
+        log_thread("decoder queue_->pushRead()");
         queue_->pushRead(std::move(tmp_));
       }
     }

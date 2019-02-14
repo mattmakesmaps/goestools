@@ -75,12 +75,26 @@ public:
       } else {
         // Wait until pushRead makes an item available
         while (write_.size() == 0) {
-          log_thread("popForWrite(): WAITING (pushRead() unblocks me)");
+          auto element_size = std::to_string(elements_);
+          auto capacity_size = std::to_string(capacity_);
+          auto write_size = std::to_string(write_.size());
+          auto message = "popForWrite(): BLOCKING write_.size(): " + std::to_string(write_.size()) +
+                         " element_size: " + element_size + " capacity_size: " + capacity_size;
+          log_thread(message);
           cv_.wait(lock);
+          log_thread("popForWrite(): UNBLOCKED");
         }
       }
     }
-    log_thread("popForWrite(): UNBLOCKED");
+    // mk adding for logging.
+    else {
+      auto element_size = std::to_string(elements_);
+      auto capacity_size = std::to_string(capacity_);
+      auto write_size = std::to_string(write_.size());
+      auto message = "popForWrite(): write_.size(): " + std::to_string(write_.size()) +
+              " element_size: " + element_size + " capacity_size: " + capacity_size;
+      log_thread(message);
+    }
     // MK NOTE: We know we have an element to return.
     // Move operation on unique pointer of template type
     // in front of queue `write_` aliased to `v`.
@@ -108,10 +122,10 @@ public:
     // MK NOTE: block until `read_` queue has an item.
     // will be notified by `pushWrite()`
     while (read_.size() == 0 && !closed_) {
-      log_thread("popForRead(): WAITING (pushWrite() unblocks me)");
+      log_thread("popForRead(): BLOCKING (pushWrite() unblocks me)");
       cv_.wait(lock);
+      log_thread("popForRead(): UNBLOCKED");
     }
-    log_thread("popForRead(): UNBLOCKED");
 
     // Allow read side to drain
     // MK NOTE: drain in this context means

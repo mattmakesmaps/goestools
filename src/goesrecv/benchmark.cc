@@ -78,7 +78,9 @@ public:
   }
 
   void drainQueue() {
+    log_thread("benchmark outQueue_->popForRead()");
     auto output = outQueue_->popForRead();
+    log_thread("benchmark outQueue_->pushRead()");
     outQueue_->pushRead(std::move(output));
   }
 
