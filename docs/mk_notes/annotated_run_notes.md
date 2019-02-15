@@ -116,48 +116,67 @@ quantization_->work(clockRecoveryQueue_, softBitsQueue_);
 ```
 
 AGC qin->popForRead()
-popForRead()
 AGC qout->popForWrite()
-popForWrite()
-popForWrite(): write_.size(): 1 element_size: 1 capacity_size: 2
+write_.size(): 1 element_size: 1 capacity_size: 2
 AGC qin->pushRead()
-pushRead(), notify_one
+notify_one()
 AGC qout->pushWrite()
-pushWrite(), notify_one
-costas: qin->popForRead()
-popForRead()
-costas: qout->popForWrite()
-popForWrite()
-popForWrite(): write_.size(): 1 element_size: 1 capacity_size: 2
-costas: qin->pushRead()
-pushRead(), notify_one
-costas: qout->pushWrite()
-pushWrite(), notify_one
-rrc: qin->popForRead()
-popForRead()
-rrc: qout->popForWrite()
-popForWrite()
-popForWrite(): write_.size(): 1 element_size: 1 capacity_size: 2
-rrc: qin->pushRead()
-pushRead(), notify_one
-rrc: qout->pushWrite()
-pushWrite(), notify_one
-clock_recovery: qin->popForRead()
-popForRead()
-clock_recovery: qout->popForWrite()
-popForWrite()
-popForWrite(): write_.size(): 1 element_size: 1 capacity_size: 2
-clock_recovery: qin->pushRead()
-pushRead(), notify_one
-clock_recovery: qout->pushWrite()
-pushWrite(), notify_one
-quantize: qin->popForRead()
-popForRead()
-quantize: qout->popForWrite()
-popForWrite()
-popForWrite(): write_.size(): 1 element_size: 1 capacity_size: 2
-quantize: qin->pushRead()
-pushRead(), notify_one
-quantize: qout->pushWrite()
-pushWrite(), notify_one
+notify_one()
 
+costas: qin->popForRead()
+costas: qout->popForWrite()
+write_.size(): 1 element_size: 1 capacity_size: 2
+costas: qin->pushRead()
+notify_one()
+costas: qout->pushWrite()
+notify_one()
+
+rrc: qin->popForRead()
+rrc: qout->popForWrite()
+write_.size(): 1 element_size: 1 capacity_size: 2
+rrc: qin->pushRead()
+notify_one()
+rrc: qout->pushWrite()
+notify_one()
+
+clock_recovery: qin->popForRead()
+clock_recovery: qout->popForWrite()
+write_.size(): 1 element_size: 1 capacity_size: 2
+clock_recovery: qin->pushRead()
+notify_one()
+clock_recovery: qout->pushWrite()
+notify_one()
+
+quantize: qin->popForRead()
+quantize: qout->popForWrite()
+write_.size(): 1 element_size: 1 capacity_size: 2
+quantize: qin->pushRead()
+notify_one()
+quantize: qout->pushWrite()
+notify_one()
+
+### Narrative Organization
+
+AGC: sourceQueue_->popForRead() pops an item from sourceQueue_.read_ 
+AGC: agcQueue_->popForWrite() pops an item from agcQueue_.write_
+write_.size(): 1 element_size: 1 capacity_size: 2
+AGC: sourceQueue_->pushRead() adds an item to sourceQueue_.write_
+pushRead() calls notify_one(), but no threads blocked.
+AGC: agcQueue_->pushWrite() adds an item to agcQueue_.read_
+pushWrite() calls notify_one(), but no threads blocked.
+
+costas: agcQueue_->popForRead() pops an item from agcQueue_.read_
+costas: costasQueue_->popForWrite() pops an item from costasQueue_.write_
+write_.size(): 1 element_size: 1 capacity_size: 2
+costas: agcQueue_->pushRead() adds an item to agcQueue_.write_
+pushRead() calls notify_one(), but no threads blocked.
+costas: costasQueue_->pushWrite() adds an item to costasQueue_.read_
+pushWrite() calls notify_one(), but no threads blocked.
+
+rrc: costasQueue_->popForRead() pops an item from costasQuee_.read_
+rrc: rrcQueue_->popForWrite() pops an item from rrcQueue_.write_
+write_.size(): 1 element_size: 1 capacity_size: 2
+rrc: costasQueue_->pushRead() adds an item to costasQueue_.write_
+pushRead() calls notify_one(), but no threads blocked.
+rrc: rrcQueue->pushWrite() adds an item to rrcQueue_.read_
+pushWrite() calls notify_one(), but no threads blocked.
