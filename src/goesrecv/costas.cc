@@ -147,7 +147,7 @@ void Costas::work(
     const std::shared_ptr<Queue<Samples> >& qin,
     const std::shared_ptr<Queue<Samples> >& qout) {
 
-  log_thread("costas: qin->pushRead()");
+  log_thread("costas: qin->popForRead()");
   auto input = qin->popForRead();
   if (!input) {
     qout->close();
