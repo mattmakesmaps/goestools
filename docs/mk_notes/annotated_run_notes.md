@@ -160,6 +160,7 @@ notify_one()
 
 ### Narrative Organization
 
+```
 AGC: sourceQueue_->popForRead() pops an item from sourceQueue_.read_ 
 AGC: agcQueue_->popForWrite() pops an item from agcQueue_.write_
 write_.size(): 1 element_size: 1 capacity_size: 2
@@ -183,3 +184,4 @@ rrc: costasQueue_->pushRead() adds an item to costasQueue_.write_
 pushRead() calls notify_one(), but no threads blocked.
 rrc: rrcQueue->pushWrite() adds an item to rrcQueue_.read_
 pushWrite() calls notify_one(), but no threads blocked.
+```
