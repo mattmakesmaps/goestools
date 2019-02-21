@@ -106,7 +106,7 @@
 
 ## Working in Demodulator::start()
 
-Here job sequence
+Here job sequence:
 ```
 agc_->work(sourceQueue_, agcQueue_);
 costas_->work(agcQueue_, costasQueue_);
@@ -115,6 +115,8 @@ clockRecovery_->work(rrcQueue_, clockRecoveryQueue_);
 quantization_->work(clockRecoveryQueue_, softBitsQueue_);
 ```
 
+Expanded:
+```
 AGC qin->popForRead()
 AGC qout->popForWrite()
 write_.size(): 1 element_size: 1 capacity_size: 2
@@ -154,6 +156,7 @@ quantize: qin->pushRead()
 notify_one()
 quantize: qout->pushWrite()
 notify_one()
+```
 
 ### Narrative Organization
 
